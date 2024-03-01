@@ -1,0 +1,54 @@
+from collections import deque
+
+# Define the maximum capacities of the jugs
+jug1_capacity = 4
+jug2_capacity = 3
+
+# Define the goal amount of water to measure
+goal_amount = 2
+
+# Define the initial state of the jugs
+initial_state = (0, 0)
+
+# Define the actions we can take
+actions = [
+    ("Fill Jug 1", lambda state: (jug1_capacity, state[1])),
+    ("Fill Jug 2", lambda state: (state[0], jug2_capacity)),
+    ("Empty Jug 1", lambda state: (0, state[1])),
+    ("Empty Jug 2", lambda state: (state[0], 0)),
+    ("Pour Jug 1 to Jug 2", lambda state: (max(0, state[0] + state[1] - jug2_capacity), min(state[0] + state[1], jug2_capacity))),
+    ("Pour Jug 2 to Jug 1", lambda state: (min(state[0] + state[1], jug1_capacity), max(0, state[0] + state[1] - jug1_capacity)))
+]
+
+# Breadth-first search algorithm
+def bfs(initial_state, goal_amount):
+    queue = deque([(initial_state, [])])
+    visited = set()
+
+    while queue:
+        current_state, actions_taken = queue.popleft()
+
+        if current_state[0] == goal_amount or current_state[1] == goal_amount:
+            return actions_taken
+
+        visited.add(current_state)
+
+        for action_name, action in actions:
+            new_state = action(current_state)
+
+            if new_state not in visited:
+                new_actions_taken = actions_taken + [action_name]
+                queue.append((new_state, new_actions_taken))
+
+    return None
+
+# Solve the problem
+solution = bfs(initial_state, goal_amount)
+
+# Print the solution
+if solution:
+    print("Solution found:")
+    for step, action in enumerate(solution, 1):
+        print(f"Step {step}: {action}")
+else:
+    print("No solution found.")

@@ -1,0 +1,42 @@
+class VacuumCleaner:
+    def __init__(self, initial_position, environment):
+        self.position = initial_position
+        self.environment = environment
+
+    def move_left(self):
+        if self.position > 0:
+            self.position -= 1
+
+    def move_right(self):
+        if self.position < len(self.environment) - 1:
+            self.position += 1
+
+    def clean(self):
+        if self.environment[self.position] == 'Dirty':
+            self.environment[self.position] = 'Clean'
+
+    def perceive_and_act(self):
+        if self.environment[self.position] == 'Dirty':
+            self.clean()
+        else:
+            if 'Dirty' in self.environment:
+                dirty_index = self.environment.index('Dirty')
+                if dirty_index < self.position:
+                    self.move_left()
+                elif dirty_index > self.position:
+                    self.move_right()
+
+
+if __name__ == "__main__":
+    # Example environment
+    environment = ['Dirty', 'Clean', 'Dirty', 'Clean', 'Dirty']
+    vacuum = VacuumCleaner(0, environment)
+
+    print("Initial Environment:", environment)
+
+    while 'Dirty' in environment:
+        print("Vacuum's current position:", vacuum.position)
+        vacuum.perceive_and_act()
+        print("Environment after action:", environment)
+
+    print("Cleaning Complete. Environment is now clean.")

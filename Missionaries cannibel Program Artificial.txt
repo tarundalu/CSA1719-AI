@@ -1,0 +1,50 @@
+from collections import deque
+
+def is_valid(state):
+    m, c, b = state
+    if m < 0 or m > 3 or c < 0 or c > 3:
+        return False
+    if (m < c and m > 0) or (3 - m < 3 - c and 3 - m > 0):
+        return False
+    return True
+
+def successors(state):
+    m, c, b = state
+    moves = [(1, 0), (0, 1), (2, 0), (0, 2), (1, 1)]
+    if b == 1:
+        moves = [(x, y) for x, y in moves]
+    for move in moves:
+        new_state = (m + move[0], c + move[1], 1 - b)
+        if is_valid(new_state):
+            yield new_state
+
+def bfs():
+    start_state = (3, 3, 1)
+    goal_state = (0, 0, 0)
+
+    queue = deque([(start_state, [])])
+    visited = set()
+
+    while queue:
+        state, path = queue.popleft()
+        if state == goal_state:
+            return path + [state]
+        if state not in visited:
+            visited.add(state)
+            for succ_state in successors(state):
+                queue.append((succ_state, path + [state]))
+
+    return None
+
+def print_solution(solution):
+    if solution is None:
+        print("No solution found.")
+    else:
+        print("Solution:")
+        for i, state in enumerate(solution):
+            m, c, b = state
+            print(f"Step {i + 1}: {m} missionaries, {c} cannibals, boat {'left' if b == 0 else 'right'}")
+
+if __name__ == "__main__":
+    solution = bfs()
+    print_solution(solution)
