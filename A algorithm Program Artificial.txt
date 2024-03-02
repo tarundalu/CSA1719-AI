@@ -1,0 +1,60 @@
+import heapq
+
+class Node:
+    def __init__(self, position, cost, heuristic):
+        self.position = position
+        self.cost = cost
+        self.heuristic = heuristic
+        self.parent = None  
+
+    def __lt__(self, other):
+        return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+
+def astar(graph, start, goal):
+    open_set = []
+    closed_set = set()
+
+    start_node = Node(start, 0, heuristic_cost(start, goal))
+    heapq.heappush(open_set, start_node)
+
+    while open_set:
+        current_node = heapq.heappop(open_set)
+
+        if current_node.position == goal:
+            return reconstruct_path(current_node)
+
+        closed_set.add(current_node.position)
+
+        for neighbor in graph[current_node.position]:
+            if neighbor not in closed_set:
+                cost = current_node.cost + graph[current_node.position][neighbor]
+                heuristic = heuristic_cost(neighbor, goal)
+                neighbor_node = Node(neighbor, cost, heuristic)
+                neighbor_node.parent = current_node  
+
+                if neighbor_node not in open_set:
+                    heapq.heappush(open_set, neighbor_node)
+
+    return None  
+
+def heuristic_cost(node, goal):
+    return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
+
+def reconstruct_path(node):
+    path = [node.position]
+    while node.parent:
+        node = node.parent
+        path.append(node.position)
+    return path[::-1]
+sample_graph = {
+    (0, 0): {(0, 1): 1, (1, 0): 1},
+    (0, 1): {(0, 0): 1, (1, 1): 1},
+    (1, 0): {(0, 0): 1, (1, 1): 1},
+    (1, 1): {(0, 1): 1, (1, 0): 1}
+}
+
+start_position = (0, 0)
+goal_position = (1, 1)
+optimal_path = astar(sample_graph, start_position, goal_position)
+
+print("Optimal Path:", optimal_path)

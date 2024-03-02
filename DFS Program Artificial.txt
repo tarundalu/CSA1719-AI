@@ -1,0 +1,38 @@
+from collections import defaultdict
+
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+
+    def dfs(self, start, visited=None, result=None):
+        if visited is None:
+            visited = set()
+        if result is None:
+            result = []
+
+        visited.add(start)
+        result.append(start)
+
+        for neighbor in self.graph[start]:
+            if neighbor not in visited:
+                self.dfs(neighbor, visited, result)
+
+        return result
+
+# Sample input
+# Create a sample graph
+sample_graph = Graph()
+sample_graph.add_edge(0, 1)
+sample_graph.add_edge(0, 2)
+sample_graph.add_edge(1, 2)
+sample_graph.add_edge(2, 0)
+sample_graph.add_edge(2, 3)
+sample_graph.add_edge(3, 3)
+
+# Sample output
+start_vertex = 2
+result = sample_graph.dfs(start_vertex)
+print(f"DFS starting from vertex {start_vertex}: {result}")

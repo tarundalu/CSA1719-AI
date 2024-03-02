@@ -1,0 +1,59 @@
+def map_coloring(graph, colors, assignment={}):
+    """
+    Solves the Map Coloring CSP using backtracking.
+
+    Parameters:
+    - graph: Adjacency list representing the map
+    - colors: List of possible colors
+    - assignment: Partial assignment of colors to regions (initially empty)
+
+    Returns:
+    - A valid assignment of colors to regions or None if no solution exists
+    """
+    if len(assignment) == len(graph):
+        return assignment  
+
+    unassigned_region = select_unassigned_variable(graph, assignment)
+
+    for color in colors:
+        if is_valid_assignment(unassigned_region, color, assignment, graph):
+            assignment[unassigned_region] = color
+
+            result = map_coloring(graph, colors, assignment)
+            if result is not None:
+                return result  
+
+            assignment.pop(unassigned_region) 
+
+    return None  
+def select_unassigned_variable(graph, assignment):
+    """
+    Selects an unassigned region with the minimum remaining values (MRV) heuristic.
+    """
+    unassigned_regions = [region for region in graph if region not in assignment]
+    return min(unassigned_regions, key=lambda region: len(graph[region]))
+
+def is_valid_assignment(region, color, assignment, graph):
+    """
+    Checks if assigning a color to a region is valid.
+    """
+    for neighbor in graph[region]:
+        if neighbor in assignment and assignment[neighbor] == color:
+            return False  
+    return True
+sample_graph = {
+    'WA': ['NT', 'SA'],
+    'NT': ['WA', 'SA', 'Q'],
+    'SA': ['WA', 'NT', 'Q', 'NSW', 'V'],
+    'Q': ['NT', 'SA', 'NSW'],
+    'NSW': ['Q', 'SA', 'V'],
+    'V': ['SA', 'NSW']
+}
+colors = ['Red', 'Green', 'Blue']
+solution = map_coloring(sample_graph, colors)
+if solution:
+    print("Map Coloring Solution:")
+    for region, color in solution.items():
+        print(f"{region}: {color}")
+else:
+    print("No solution found.")
